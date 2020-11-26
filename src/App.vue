@@ -8,10 +8,10 @@
       <h1 class="game-title">Simon the game</h1>
       <div class="game-field">
         <ul>
-          <li @click="checkBtn($event)" id="top-right" class="btn red" data="1"></li>
-          <li @click="checkBtn($event)" id="top-left" class="btn blue" data="2"></li>
-          <li @click="checkBtn($event)" id="bottom-left" class="btn yellow" data="3"></li>
-          <li @click="checkBtn($event)" id="bottom-right" class="btn green" data="4"></li>
+          <li @click="++pressCount; check($event)" id="top-right" class="btn red" data="1"></li>
+          <li @click="++pressCount; check($event)" id="top-left" class="btn blue" data="2"></li>
+          <li @click="++pressCount; check($event)" id="bottom-left" class="btn yellow" data="3"></li>
+          <li @click="++pressCount; check($event)" id="bottom-right" class="btn green" data="4"></li>
         </ul>
       </div>
       <div class="game-menu">
@@ -47,75 +47,93 @@ export default {
   data() {
     return {
       round: 0,
+      pressCount: 0,
       userSequence: [],
-      simonSequence: ["1", "3", "2", "4"],
+      simonSequence: [],
       timeout: 1000,
       lose: false
-    }
+    };
   },
   methods: {
     startGame() {
-      this.clear()
-      this.play()
-    },
-    flashing() {
-      const btns = document.querySelectorAll('.btn')
-      let i = 0
-      
+      this.clear();
+      this.play();
     },
     play() {
-      const btns = document.querySelectorAll('.btn')
-      let randomNum = this.getRandomNum() + ''
-
-      btns.forEach(item => {
-        this.flash(item, randomNum)
-      })
-      this.simonSequence.push(randomNum) // Запись рандомных чисел в массив Simon
-      this.round++
+      let randomNum = this.getRandomNum() + "";
+      this.simonSequence.push(randomNum); // Запись рандомных чисел в массив Simon
+      this.replay();
+      this.round++;
+      this.pressCount = 0;
     },
-    flash(btn, randomNum) {
-      if (randomNum === btn.getAttribute('data')) {
-        this.playSound(btn)
-        btn.classList.add('flash')
-        
+    replay() {
+      const btns = document.querySelectorAll(".btn");
+
+      for (let i = 0; i < this.simonSequence.length; i++) {
         setTimeout(() => {
-          btn.classList.remove('flash')
-        }, this.timeout)
+          btns.forEach(btn => {
+            if (this.simonSequence[i] === btn.getAttribute("data")) {
+              setTimeout(() => {
+                this.playSound(btn);
+                btn.classList.add("flash");
+
+                setTimeout(() => {
+                  btn.classList.remove("flash");
+                }, this.timeout);
+              }, i * this.timeout);
+            }
+          });
+        }, i * this.timeout);
       }
     },
     playSound(pressedBtn) {
-      let sound = document.getElementById(pressedBtn.getAttribute('data'))
-      sound.currentTime = 0
-      sound.play()
+      let sound = document.getElementById(pressedBtn.getAttribute("data"));
+      // sound.currentTime = 0;
+      // sound.play();
     },
-    checkBtn(event) {
-      let pressedBtn = event.target
-      this.playSound(pressedBtn)
-      this.userSequence.push(pressedBtn.getAttribute('data'))
-      this.compare()
-    },
-    compare() {
-      if (JSON.stringify(this.userSequence) === JSON.stringify(this.simonSequence)) {
-        setTimeout(() => {
-          this.play()
-        }, this.timeout)
-      } else this.lose = true
+    check(event) {
+      let pressedBtn = event.target;
+      this.playSound(pressedBtn);
+
+      if (
+        !(
+          pressedBtn.getAttribute("data") ===
+          this.simonSequence[this.pressCount - 1]
+        )
+      ) {
+        this.lose = true;
+      }
+
+      if (this.pressCount === this.simonSequence.length) {
+        this.userSequence.push(pressedBtn.getAttribute("data"));
+
+        if (
+          JSON.stringify(this.userSequence) ===
+          JSON.stringify(this.simonSequence)
+        ) {
+          setTimeout(() => {
+            this.play();
+          }, this.timeout);
+        } else {
+          this.lose = true;
+        }
+      }
     },
     getRandomNum() {
-      let randomNum = Math.floor(Math.random() * 4) + 1
-      return randomNum
+      let randomNum = Math.floor(Math.random() * 4) + 1;
+      return randomNum;
     },
     clear() {
-      this.round = 0,
-      this.userSequence = [],
-      this.simonSequence = [],
-      this.lose = false
+      (this.round = 0),
+        (this.userSequence = []),
+        (this.simonSequence = []),
+        (this.lose = false);
     },
     changeDifficult(ms) {
-      this.timeout = ms
+      this.timeout = ms;
     }
   }
-}
+};
 </script>
 
 <style lang="sass">
@@ -223,6 +241,7 @@ html, body
 
 .lose
   opacity: 0
+  colo: red
   font-size: 1.6rem
   position: absolute
   margin-top: -23px
