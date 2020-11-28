@@ -1,19 +1,3 @@
-# simon-says
+# Simon Says
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+[![Logo Simon Says](https://i.ibb.co/t4FJfMZ/Screenshot-2020-11-28-135250.png "Simon the Game")](https://webdevfozie.github.io/simon-says/dist/)
