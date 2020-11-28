@@ -23,17 +23,17 @@
         <h2 class="settings-title">Уровень сложности:</h2>
         <div class="game-settings">
           <label class="settings-item" for="easy">
-            <input @change="changeDifficult(1500)" type="radio" name="difficult" id="easy" class="difficult">
+            <input @change="changeDifficult(750)" type="radio" name="difficult" id="easy" class="difficult">
             Легкий
           </label>
 
           <label class="settings-item" for="medium">
-            <input @change="changeDifficult(1000)" type="radio" name="difficult" id="medium" class="difficult" checked>
+            <input @change="changeDifficult(500)" type="radio" name="difficult" id="medium" class="difficult" checked>
             Средний
           </label>
 
           <label class="settings-item" for="hard">
-            <input @change="changeDifficult(400)" type="radio" name="difficult" id="hard" class="difficult">
+            <input @change="changeDifficult(200)" type="radio" name="difficult" id="hard" class="difficult">
             Сложный
           </label>
         </div>
@@ -50,7 +50,7 @@ export default {
       pressCount: 0,
       userSequence: [],
       simonSequence: [],
-      timeout: 1000,
+      timeout: 500,
       btnLock: true,
       lose: false
     };
