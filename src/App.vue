@@ -6,7 +6,7 @@
     <audio id="4" src="https://s3.amazonaws.com/freecodecamp/simonSound4.mp3"/>
     <div class="container">
       <h1 class="game-title">Simon the game</h1>
-      <div class="game-field">
+      <div v-bind:class="{'btn-lock': btnLock}" class="game-field">
         <ul>
           <li @click="++pressCount; check($event)" id="top-right" class="btn red" data="1"></li>
           <li @click="++pressCount; check($event)" id="top-left" class="btn blue" data="2"></li>
@@ -51,6 +51,7 @@ export default {
       userSequence: [],
       simonSequence: [],
       timeout: 1000,
+      btnLock: true,
       lose: false
     };
   },
@@ -60,7 +61,7 @@ export default {
       this.play();
     },
     play() {
-      let randomNum = this.getRandomNum() + "";
+      let randomNum = Math.floor(Math.random() * 4) + 1 + "";
       this.simonSequence.push(randomNum); // Запись рандомных чисел в массив Simon
       this.replay();
       this.round++;
@@ -68,6 +69,7 @@ export default {
     },
     replay() {
       const btns = document.querySelectorAll(".btn");
+      this.btnLock = true
 
       for (let i = 0; i < this.simonSequence.length; i++) {
         setTimeout(() => {
@@ -85,48 +87,45 @@ export default {
           });
         }, i * this.timeout);
       }
+      setTimeout(() => {
+        this.btnLock = false
+      }, this.simonSequence.length * this.timeout)
     },
     playSound(pressedBtn) {
       let sound = document.getElementById(pressedBtn.getAttribute("data"));
-      // sound.currentTime = 0;
-      // sound.play();
+      sound.currentTime = 0;
+      sound.play();
     },
     check(event) {
       let pressedBtn = event.target;
-      this.playSound(pressedBtn);
+      if (!this.btnLock) {
+        this.playSound(pressedBtn);
 
-      if (
-        !(
-          pressedBtn.getAttribute("data") ===
-          this.simonSequence[this.pressCount - 1]
-        )
-      ) {
-        this.lose = true;
-      }
-
-      if (this.pressCount === this.simonSequence.length) {
-        this.userSequence.push(pressedBtn.getAttribute("data"));
-
-        if (
-          JSON.stringify(this.userSequence) ===
-          JSON.stringify(this.simonSequence)
-        ) {
-          setTimeout(() => {
-            this.play();
-          }, this.timeout);
-        } else {
+        if (!(pressedBtn.getAttribute("data") ===
+            this.simonSequence[this.pressCount - 1])) {
           this.lose = true;
+        }
+
+        if (this.pressCount === this.simonSequence.length) {
+          this.userSequence.push(pressedBtn.getAttribute("data"));
+
+          if (
+              JSON.stringify(this.userSequence) ===
+              JSON.stringify(this.simonSequence)
+          ) {
+            setTimeout(() => {
+              this.play();
+            }, this.timeout);
+          } else {
+            this.lose = true;
+          }
         }
       }
     },
-    getRandomNum() {
-      let randomNum = Math.floor(Math.random() * 4) + 1;
-      return randomNum;
-    },
     clear() {
-      (this.round = 0),
-        (this.userSequence = []),
-        (this.simonSequence = []),
+      (this.round = 0);
+        (this.userSequence = []);
+        (this.simonSequence = []);
         (this.lose = false);
     },
     changeDifficult(ms) {
@@ -165,6 +164,7 @@ html, body
   border-radius: 50%
   float: left
   overflow: hidden
+  z-index: 1
   position: relative
   border: 1px #000 solid
   margin-right: 4rem
@@ -175,13 +175,15 @@ html, body
   width: 14.8rem
   opacity: .55
   cursor: pointer
-  z-index: 1
   transition: .1s
   &:hover
     opacity: .6
   &:active
     opacity: 1
     background: #fff
+
+.btn-lock
+  z-index: 0 !important
 
 .red
   background: red
@@ -209,9 +211,8 @@ html, body
 
 .game-menu
   width: 100%
+  min-height: 300px
   position: relative
-
-.game-info
 
 .info-title
   font-size: 2.5rem
@@ -234,14 +235,14 @@ html, body
   transition: 0.15s
   &:hover
     opacity: 1
-    box-shadow: 2px 2px 0px 0px rgba(0, 0, 255, .4)
+    box-shadow: 2px 2px 0 0 rgba(0, 0, 255, .4)
   &:active
     opacity: 0.8
-    box-shadow: 0px 0px 0px 0px
+    box-shadow: 0 0 0 0
 
 .lose
   opacity: 0
-  colo: red
+  color: red
   font-size: 1.6rem
   position: absolute
   margin-top: -23px
